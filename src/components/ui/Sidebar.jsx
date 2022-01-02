@@ -3,9 +3,9 @@ import Logo from '../../assets/logo_resto2.png'
 
 const Sidebar = () => {
   return (
-    <div className="md:w-2/5 xl:w-1/5 bg-gray-800 ">
+    <div className="md:w-2/5 xl:w-1/5 bg-gradient-to-r from-gray-900 to-gray-700 ">
       <div className="p-6">
-        <img src={Logo}/>
+        <img src={Logo} />
         <nav className="mt-10">
           <NavLink
             className={(navData) =>
