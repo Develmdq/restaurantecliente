@@ -1,8 +1,7 @@
 import { useState } from "react";
 import { Routes, Route } from "react-router";
 import firebaseApp, { FirebaseContext } from "./firebase";
-import Sidebar from "./components/ui/Sidebar";
-import FirstPage from "./components/pages/FirstPage";
+import HomePage from "./components/pages/HomePage";
 import Orders from "./components/pages/Orders";
 import Menu from "./components/pages/Menu";
 
@@ -12,12 +11,12 @@ const App = () => {
     <>
       {userGlobal ? (
         <FirebaseContext.Provider value={{ firebaseApp }}>
-          <div className="md:flex min-h-screen ">
-            <Sidebar />
+          <div className="md:flex min-h-screen ">            
             <div className="md:w-3/5 xl:w-4/5 p-6">
               <Routes>
-                <Route path="/" element={<Orders />} />
+                <Route path="/" element={<HomePage />} />
                 <Route path="/menu" element={<Menu />} />
+                <Route path="/orders" element={<Orders />} />
               </Routes>
             </div>
           </div>
@@ -25,7 +24,7 @@ const App = () => {
       ) : (
         <div className="md:flex min-h-screen">
           <FirebaseContext.Provider value={{ firebaseApp }}>
-            <FirstPage setUserGlobal={setUserGlobal} />
+            <HomePage setUserGlobal={setUserGlobal} />
           </FirebaseContext.Provider>
         </div>
       )}

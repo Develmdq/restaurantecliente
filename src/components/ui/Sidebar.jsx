@@ -1,10 +1,11 @@
 import { NavLink } from "react-router-dom";
-import Logo from '../../assets/logo_resto2.png'
+import Logo from "../../assets/logo_resto2.png";
+import BtnSesion from "../BtnSesion";
 
 const Sidebar = () => {
   return (
-    <div className="md:w-2/5 xl:w-1/5 bg-gradient-to-r from-gray-900 to-gray-700 ">
-      <div className="p-6">
+    <div className="md:w-2/5 xl:w-1/5 bg-gradient-to-r from-gray-900 to-gray-700 flex flex-col">
+      <div className="p-6 ">
         <img src={Logo} />
         <nav className="mt-10">
           <NavLink
@@ -14,7 +15,7 @@ const Sidebar = () => {
                 : "text-gray-400 p-2  block hover:text-gray-500 rounded-lg tracking-wide text-2xl"
             }
             exact="true"
-            to="/"
+            to="/orders"
           >
             Órdenes
           </NavLink>
@@ -30,6 +31,14 @@ const Sidebar = () => {
             Menú
           </NavLink>
         </nav>
+      </div>
+      <div className=" self-center mt-auto ">
+        <BtnSesion
+          text="Cerrar sesión"
+          onClick={() => {
+            console.log("algo2");
+          }}
+        />
       </div>
     </div>
   );

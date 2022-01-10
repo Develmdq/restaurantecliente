@@ -4,6 +4,7 @@ import * as Yup from "yup";
 import { FirebaseContext } from "../../firebase";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import Logo from "../../assets/logo_resto.png";
+import BtnSesion from "../BtnSesion";
 
 const Login = ({ setUserGlobal }) => {
   //Context con operaciones de firebase
@@ -38,7 +39,7 @@ const Login = ({ setUserGlobal }) => {
   });
 
   return (
-    <div className="container mx-auto p-5  flex flex-col bg-gray-200">
+    <div className="container mx-auto p-5  flex flex-col">
       <h1 className="text-3xl font-light mb-2 text-center">Iniciar Sesión</h1>
       <div className="flex justify-center mt-8">
         <div className="w-full max-w-3xl">
@@ -98,6 +99,23 @@ const Login = ({ setUserGlobal }) => {
             ) : null}
           </form>
         </div>
+      </div>
+      <div className=" p-2 my-2 self-center">
+        <a href='/homePage'>¿Has olvidado los datos de ingreso?</a>
+      </div>
+      <div className="self-center">
+        <BtnSesion
+          text="Iniciar Sesión"
+          onClick={() => {
+            console.log("algo1");
+          }}
+        />
+        <BtnSesion
+          text="Registrarse"
+          onClick={() => {
+            console.log("algo2");
+          }}
+        />
       </div>
     </div>
   );
