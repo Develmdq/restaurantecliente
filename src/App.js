@@ -1,33 +1,24 @@
-import { useState } from "react";
-import { Routes, Route } from "react-router";
+import { Routes, Route } from "react-router-dom";
 import firebaseApp, { FirebaseContext } from "./firebase";
-import HomePage from "./components/pages/HomePage";
-import Orders from "./components/pages/Orders";
-import Menu from "./components/pages/Menu";
+import LayoutLogin from "./pages/LayoutLogin";
+import Orders from "./pages/Orders";
+import Menu from "./pages/Menu";
+import Page404 from "./pages/Page404";
+import PrivateRoute from './components/PrivateRoute'
 
 const App = () => {
-  const [userGlobal, setUserGlobal] = useState(false);
   return (
     <>
-      {userGlobal ? (
-        <FirebaseContext.Provider value={{ firebaseApp }}>
-          <div className="md:flex min-h-screen ">            
-            <div className="md:w-3/5 xl:w-4/5 p-6">
-              <Routes>
-                <Route path="/" element={<HomePage />} />
-                <Route path="/menu" element={<Menu />} />
-                <Route path="/orders" element={<Orders />} />
-              </Routes>
-            </div>
-          </div>
-        </FirebaseContext.Provider>
-      ) : (
-        <div className="md:flex min-h-screen">
-          <FirebaseContext.Provider value={{ firebaseApp }}>
-            <HomePage setUserGlobal={setUserGlobal} />
-          </FirebaseContext.Provider>
-        </div>
-      )}
+      <FirebaseContext.Provider value={{ firebaseApp }}>
+        <Routes>
+          {/* <Route path="/" element={<LayoutLogin />} /> */}
+          <Route path="*" element={<Page404 />} />
+          <Route path="sesion" element={<PrivateRoute />}>
+            <Route path="orders" element={<Orders />} />
+            <Route path="menu" element={<Menu />} />
+          </Route>
+        </Routes>
+      </FirebaseContext.Provider>
     </>
   );
 };
