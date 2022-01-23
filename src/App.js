@@ -11,7 +11,7 @@ const App = () => {
     <>
       <FirebaseContext.Provider value={{ firebaseApp }}>
         <Routes>
-          {/* <Route path="/" element={<LayoutLogin />} /> */}
+          <Route path="/" element={<LayoutLogin />} />
           <Route path="*" element={<Page404 />} />
           <Route path="sesion" element={<PrivateRoute />}>
             <Route path="orders" element={<Orders />} />

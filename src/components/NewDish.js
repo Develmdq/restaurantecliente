@@ -1,32 +1,18 @@
 import { useContext, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { useFormik } from "formik";
 import { ImUndo2, ImPlus } from "react-icons/im";
-import * as Yup from "yup";
 import { collection, addDoc } from "firebase/firestore";
-import Swal from "sweetalert2";
-import FileUploader from "react-firebase-file-uploader";
+import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { FirebaseContext } from "../firebase";
-import BtnSesion from "../components/BtnSesion";
+import * as Yup from "yup";
+import Swal from "sweetalert2";
+import BtnSesion from "./BtnSesion";
 
-const NewDish = () => {
-  const [uploading, setUploading] = useState(false);
-  const [progress, setProgress] = useState(0);
+const NewDish = ({ setNewDish }) => {
   const [urlImage, setUrlImage] = useState("");
-  const navigate = useNavigate();
 
   //Context con operaciones de firebase
   const { firebaseApp } = useContext(FirebaseContext);
-
-  const showAlert = () => {
-    Swal.fire({
-      position: "center",
-      icon: "success",
-      title: "Agregado correctamente",
-      showConfirmButton: false,
-      timer: 2000,
-    });
-  };
 
   //Validación y lectura del formulario
   const formik = useFormik({
@@ -47,11 +33,12 @@ const NewDish = () => {
       category: Yup.string().required("La categoría es obligatoria"),
       description: Yup.string()
         .min(10, "La descripción debe ser más larga")
-        .required("La descripción es obligatoria"),
+        .required(" La descripción es obligatoria"),
     }),
     onSubmit: (dish) => {
       try {
-        dish.existencia = "true";
+        dish.existence = "true";
+        dish.image = urlImage;
         addDoc(collection(firebaseApp.db, "dishes"), { dish });
         showAlert();
       } catch (error) {
@@ -60,33 +47,24 @@ const NewDish = () => {
     },
   });
 
-  // Funciones para tratamiento de la subida de imagenes
-
-  const handleUploadStart = () => {
-    setProgress(0);
-    setUploading(true);
-  };
-  const handleUploadError = (error) => {
-    setUploading(false);
-    console.log(error);
-  };
-  const handleUploadSuccess = async (nameDish) => {
-    setProgress(100);
-    setUploading(false);
-
-    //Almadenar URL de destino
-    const url = await firebaseApp.storage
-      .ref("productos")
-      .child(nameDish)
-      .getDownloadURL();
-    console.log(url);
-    setUrlImage(url);
-  };
-  const handleProgress = () => {
-    setProgress(progress);
-    console.log(progress);
+  const handleFile = async (e) => {
+    const localFile = e.target.files[0];
+    const fileRef = ref(firebaseApp.storage, `dish/${localFile.name}`);
+    await uploadBytes(fileRef, localFile);
+    const urlImage = await getDownloadURL(fileRef);
+    setUrlImage(urlImage);
   };
 
+  const showAlert = () => {
+    Swal.fire({
+      position: "center",
+      icon: "success",
+      title: "Agregado correctamente",
+      showConfirmButton: false,
+      timer: 2000,
+    }).then(() => setNewDish(true));
+  };
+  
   return (
     <div className="w-10/12 self-center">
       <h1 className="text-3xl font-light mb-5">Agregar nuevo plato</h1>
@@ -160,19 +138,21 @@ const NewDish = () => {
               <div className="mb-4">
                 <label
                   className="block text-gray-700 text-xs font-bold mb-2 mx-3"
-                  htmlFor="price"
+                  htmlFor="category"
                 >
                   Categoría
                 </label>
                 <select
-                  className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                  id="price"
-                  name="categoria"
+                  className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline text-xs"
+                  id="category"
+                  name="category"
                   value={formik.values.category}
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
                 >
-                  <option value="">-- Seleccione --</option>
+                  <option value="" className="text-red-700">
+                    - Seleccione -
+                  </option>
                   <option value="desayuno">Desayuno</option>
                   <option value="almuerzo">Almuerzo</option>
                   <option value="cena">Cena</option>
@@ -195,33 +175,27 @@ const NewDish = () => {
             <div className="mb-4 w-6/12 px-5">
               <label
                 className="block text-gray-700 text-xs font-bold mb-2 mx-3"
-                htmlFor="imagen"
+                htmlFor="image"
               >
                 Imagen
               </label>
-              <FileUploader
-                accept="image/*"
-                id="imagen"
-                name="imagen"
-                randomizeFilename
-                // storageRef={firebase.storage.ref("dishes")}
-                onUploadStart={handleUploadStart}
-                onUploadError={handleUploadError}
-                onUploadSuccess={handleUploadSuccess}
-                onProgress={handleProgress}
+              <input
+                type="file"
+                className="block w-full"
+                onChange={handleFile}
               />
             </div>
           </div>
           <div className="mb-4 w-12/12 px-5">
             <label
               className="block text-gray-700 text-xs font-bold mb-2 mx-3"
-              htmlFor="descripcion"
+              htmlFor="description"
             >
               Descripción
             </label>
             <textarea
               className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline h-40"
-              id="descripcion"
+              id="description"
               placeholder="Descripción"
               value={formik.values.description}
               onChange={formik.handleChange}
@@ -234,9 +208,10 @@ const NewDish = () => {
               role="alert"
             >
               <p className="font-bold">
-                Hubo un error:{" "}
+                Hubo un error:{""}
                 <span className="font-normal">
-                  {formik.errors.description}{" "}
+                  {" "}
+                  {formik.errors.description}
                 </span>
               </p>
             </div>
@@ -252,7 +227,7 @@ const NewDish = () => {
           <BtnSesion
             icon={<ImUndo2 style={{ color: "white", marginRight: "20px" }} />}
             text="Volver"
-            onClick={() => navigate(-1, { replace: true })}
+            onClick={() => setNewDish(true)}
           />
         </div>
       </form>
