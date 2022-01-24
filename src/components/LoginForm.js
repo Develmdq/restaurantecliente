@@ -21,88 +21,6 @@ const LoginForm = ({ login, setLogin }) => {
   //Context con operaciones de firebase
   const { firebaseApp } = useContext(FirebaseContext);
 
-  const handleShowPass = () => setShowPass(!showPass);
-
-  const handleLogin = () => {
-    firebaseApp.auth.currentUser.emailVerified
-      ? onAuthStateChanged(firebaseApp.auth, (userFirebase) => {
-          userFirebase && navigate("sesion", { replace: true });
-        })
-      : handleAlert("noVerified");
-  };
-
-  const handleRegister = () => {
-    handleAlert("newRegister");
-    setLogin(true);
-  };
-
-  const handleAlert = (message) => {
-    switch (message) {
-      case "recoverPass":
-        Swal.fire({
-          title: "Recuperación de contraseña",
-          text: "Ingresa tu dirección de correo para recuperar la contraseña",
-          icon: "warning",
-          returnInputValueOnDeny: false,
-          input: "email",
-          inputAttributes: {
-            autocapitalize: "off",
-          },
-          showCancelButton: true,
-          confirmButtonColor: "#3085d6",
-          cancelButtonColor: "#d33",
-          confirmButtonText: "Enviar",
-        }).then((result) => {
-          if (result.isConfirmed) {
-            Swal.fire("Enviado!", "Revisa tu correo electrónico.", "success");
-            sendPasswordResetEmail(firebaseApp.auth, result.value);
-          }
-        });
-        break;
-      case "noFound":
-        Swal.fire({
-          title: "Usuario no encontrado!!",
-          text: "Regístrate para iniciar sesión.",
-          icon: "error",
-        });
-        break;
-      case "wrongPassword":
-        Swal.fire({
-          title: "Contraseña Incorrecta!!",
-          text: "Revisa la contraseña",
-          icon: "error",
-        });
-        break;
-      case "noVerified":
-        Swal.fire({
-          title: "Error!!",
-          text: "Tus credenciales no cuentan con permiso de acceso",
-          icon: "error",
-        });
-        break;
-      case "newRegister":
-        Swal.fire({
-          title: "Gracias por registrarte!!",
-          text: "Te enviaremos un email confirmando el acceso",
-          icon: "info",
-          iconColor: "blue",
-        });
-        break;
-      case "inUse":
-        Swal.fire({
-          title: "El usuario ya existe!!",
-          text: " El dirección de correo que ingresaste ya se encuentra registrada.",
-          footer: " Intenta iniciar sesión.",
-          icon: "error",
-        }).then(() => {
-          setLogin(true);
-        });
-        break;
-      default:
-        break;
-    }
-  };
-
   //Validación y lectura del formulario
   const formik = useFormik({
     initialValues: {
@@ -118,51 +36,121 @@ const LoginForm = ({ login, setLogin }) => {
         .required("Ingresa un email válido."),
     }),
     onSubmit: async ({ passUser, emailUser }) => {
-      login
-        ? await signInWithEmailAndPassword(
-            //Inicio de sesion usuario registrado
-            firebaseApp.auth,
-            emailUser,
-            passUser
-          )
-            .then(() => handleLogin())
-            .catch((error) => {
-              switch (error.message) {
-                case "Firebase: Error (auth/user-not-found).":
-                  handleAlert("noFound");
-                  break;
-                case "Firebase: Error (auth/wrong-password).":
-                  handleAlert("wrongPassword");
-                  break;
-                default:
-                  console.log(error);
-                  break;
-              }
-            })
-        : await createUserWithEmailAndPassword(
-            //Registro de nuevo usuario
-            firebaseApp.auth,
-            emailUser,
-            passUser
-          )
-            .then(() => handleRegister())
-            .then(() => {
-              sendEmailVerification(firebaseApp.auth.currentUser).then(
-                () => "cdcmdq@gmail.com"
-              );
-            })
-            .catch((error) => {
-              switch (error.message) {
-                case "Firebase: Error (auth/email-already-in-use).":
-                  handleAlert("inUse");
-                  break;
-                default:
-                  console.log(error);
-                  break;
-              }
-            });
+      try {
+        login
+          ? await signInWithEmailAndPassword(
+              //Inicio de sesion usuario registrado
+              firebaseApp.auth,
+              emailUser,
+              passUser
+            ).then(handleLogin())
+          : await createUserWithEmailAndPassword(
+              //Registro de nuevo usuario
+              firebaseApp.auth,
+              emailUser,
+              passUser
+            ).then(handleRegister());
+      } catch (error) {
+        switch (error.message) {
+          case "Firebase: Error (auth/user-not-found).":
+            handleAlert("noFound");
+            break;
+          case "Firebase: Error (auth/wrong-password).":
+            handleAlert("wrongPassword");
+            break;
+          case "Firebase: Error (auth/email-already-in-use).":
+            handleAlert("inUse");
+            break;
+          default:
+            console.log(error);
+            break;
+        }
+      }
     },
   });
+
+    const handleShowPass = () => setShowPass(!showPass);
+
+    const handleLogin = () => {
+      firebaseApp.auth.currentUser.emailVerified
+        ? onAuthStateChanged(firebaseApp.auth, (userFirebase) => {
+            userFirebase && navigate("sesion", { replace: true });
+          })
+        : handleAlert("noVerified");
+    };
+
+    const handleRegister = () => {
+      sendEmailVerification(firebaseApp.auth.currentUser);
+      handleAlert("newRegister");
+      setLogin(true);
+    };
+
+    const handleAlert = (message) => {
+      switch (message) {
+        case "recoverPass":
+          Swal.fire({
+            title: "Recuperación de contraseña",
+            text: "Ingresa tu dirección de correo para recuperar la contraseña",
+            icon: "warning",
+            returnInputValueOnDeny: false,
+            input: "email",
+            inputAttributes: {
+              autocapitalize: "off",
+            },
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Enviar",
+          }).then((result) => {
+            if (result.isConfirmed) {
+              Swal.fire("Enviado!", "Revisa tu correo electrónico.", "success");
+              sendPasswordResetEmail(firebaseApp.auth, result.value);
+            }
+          });
+          break;
+        case "noFound":
+          Swal.fire({
+            title: "Usuario no encontrado!!",
+            text: "Regístrate para iniciar sesión.",
+            icon: "error",
+          });
+          break;
+        case "wrongPassword":
+          Swal.fire({
+            title: "Contraseña Incorrecta!!",
+            text: "Revisa la contraseña",
+            icon: "error",
+          });
+          break;
+        case "noVerified":
+          Swal.fire({
+            title: "Error!!",
+            text: "Tus credenciales no cuentan con permiso de acceso",
+            icon: "error",
+          });
+          break;
+        case "newRegister":
+          Swal.fire({
+            title: "Gracias por registrarte!!",
+            text: "Te enviaremos un email confirmando el acceso",
+            icon: "info",
+            iconColor: "blue",
+          });
+          break;
+        case "inUse":
+          Swal.fire({
+            title: "El usuario ya existe!!",
+            text: " El dirección de correo que ingresaste ya se encuentra registrada.",
+            footer: " Intenta iniciar sesión.",
+            icon: "error",
+          }).then(() => {
+            setLogin(true);
+          });
+          break;
+        default:
+          break;
+      }
+    };
 
   return (
     <>

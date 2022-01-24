@@ -37,7 +37,7 @@ const NewDish = ({ setNewDish }) => {
     }),
     onSubmit: (dish) => {
       try {
-        dish.existence = "true";
+        dish.existence = true;
         dish.image = urlImage;
         addDoc(collection(firebaseApp.db, "dishes"), { dish });
         showAlert();
@@ -153,12 +153,11 @@ const NewDish = ({ setNewDish }) => {
                   <option value="" className="text-red-700">
                     - Seleccione -
                   </option>
-                  <option value="desayuno">Desayuno</option>
-                  <option value="almuerzo">Almuerzo</option>
-                  <option value="cena">Cena</option>
+                  <option value="desayuno-merienda">Desayuno-Merienda</option>
+                  <option value="almuerzo-cena">Almuerzo-Cena</option>
                   <option value="bebidas">Bebidas</option>
-                  <option value="postres">Postre</option>
-                  <option value="ensalada">Ensalada</option>
+                  <option value="postres">Postres</option>
+                  <option value="ensaladas">Ensaladas</option>
                 </select>
               </div>
               {formik.touched.category && formik.errors.category && (
