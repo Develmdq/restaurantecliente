@@ -19,7 +19,7 @@ const Sidebar = () => {
   };
 
   return (
-    <div className="w-2/12 bg-gradient-to-r from-gray-900 to-gray-700 flex flex-col min-h-screen items-center">
+    <div className="w-6/12 md:w-2/12 bg-gradient-to-r from-gray-900 to-gray-700 flex flex-col min-h-screen items-center">
       <div className="p-6 fixed">
         <img src={logo} alt={"logo"} className=" w-50 " />
         <nav className="mt-10 flex flex-col">
@@ -48,7 +48,7 @@ const Sidebar = () => {
         </nav>
       </div>
       <div className=" self-center mt-auto fixed bottom-0">
-        <p className="text-gray-400 p-2 self-center block hover:text-gray-500 text-center">
+        <p className="text-gray-400 p-2 self-center block hover:text-gray-500 text-center text-xs md:text-sm">
           {userEmail}
         </p>
         <BtnSesion text="Cerrar sesión" onClick={handleActions} />

@@ -1,7 +1,7 @@
-const BtnSesion = ({ type, value, onClick, text, icon, disabled }) => (
+const BtnSesion = ({ type, onClick, text, icon, disabled }) => (
   <button
     type={type}
-    className="bg-gray-800 hover:bg-gray-900 w-48 mx-5 my-5 p-2 text-white font-bold rounded-lg flex items-center justify-center"
+    className="bg-gray-800 hover:bg-gray-900 w-12/12 mx-5 my-5 p-2 text-white font-bold rounded-lg flex items-center justify-center"
     onClick={onClick}
     disabled={disabled}
   >
